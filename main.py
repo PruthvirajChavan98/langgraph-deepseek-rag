@@ -29,8 +29,8 @@ os.makedirs(VECTORSTORE_BASE_PATH, exist_ok=True)  # Ensure the vectorstore dire
 
 # Pre-initialize components (embeddings, vectorstore, retriever)
 embeddings = HuggingFaceEmbeddings(model_name="nomic-ai/modernbert-embed-base", cache_folder="./saved_model")
-llm_chat = ChatOpenAI(model="deepseek-chat", temperature=0, openai_api_key="sk-2c1ea644a7b644b891a793a0f8ab9c1a", openai_api_base='https://api.deepseek.com')
-llm_resoner = ChatOpenAI(model="deepseek-reasoner", temperature=0, openai_api_key="sk-2c1ea644a7b644b891a793a0f8ab9c1a", openai_api_base='https://api.deepseek.com')
+llm_chat = ChatOpenAI(model="deepseek-chat", temperature=0, openai_api_key="YOUR_DEEPSEEK_API_KEY", openai_api_base='https://api.deepseek.com')
+llm_resoner = ChatOpenAI(model="deepseek-reasoner", temperature=0, openai_api_key="YOUR_DEEPSEEK_API_KEY", openai_api_base='https://api.deepseek.com')
 
 # Pydantic model
 class AskQuestionRequest(BaseModel):
@@ -98,9 +98,6 @@ async def upload_pdf(file: UploadFile = File(...)):
 @app.post("/ask")
 async def ask_question(request: Request, params: AskQuestionRequest):
     try:
-        # Read and print the raw body as a string
-        body = await request.body()  # This reads the request body
-        print(body.decode('utf-8'))  # Decode bytes to string
         
         # Rest of the logic
         metadata = get_pipeline_metadata(params.pdf_name)
