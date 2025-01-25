@@ -2,11 +2,15 @@ from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 import os
-import sqlite3
-from DocumentProcessingPipeline.document_processing_pipeline import DocumentProcessingPipeline
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+from DocumentProcessingPipeline.document_processing_pipeline import DocumentProcessingPipeline
+from utility.db_utility import init_db, get_pipeline_metadata, store_pipeline_metadata
+
+load_dotenv()
 
 # Create FastAPI app
 app = FastAPI()
@@ -20,55 +24,21 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-# Initialize database
-DB_PATH = "pipelines.db"
 UPLOAD_FOLDER = "./uploads"
 VECTORSTORE_BASE_PATH = "./vectorstores"  # Base folder for all vectorstore data
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(VECTORSTORE_BASE_PATH, exist_ok=True)  # Ensure the vectorstore directory exists
 
 # Pre-initialize components (embeddings, vectorstore, retriever)
 embeddings = HuggingFaceEmbeddings(model_name="nomic-ai/modernbert-embed-base", cache_folder="./saved_model")
-llm_chat = ChatOpenAI(model="deepseek-chat", temperature=0, openai_api_key="YOUR_DEEPSEEK_API_KEY", openai_api_base='https://api.deepseek.com')
-llm_resoner = ChatOpenAI(model="deepseek-reasoner", temperature=0, openai_api_key="YOUR_DEEPSEEK_API_KEY", openai_api_base='https://api.deepseek.com')
+llm_chat = ChatOpenAI(model="deepseek-chat", temperature=0, openai_api_key=DEEPSEEK_API_KEY, openai_api_base='https://api.deepseek.com')
+llm_resoner = ChatOpenAI(model="deepseek-reasoner", temperature=0, openai_api_key=DEEPSEEK_API_KEY, openai_api_base='https://api.deepseek.com')
 
 # Pydantic model
 class AskQuestionRequest(BaseModel):
     question: str = Field(..., description="Question about the PDF.")
     pdf_name: str = Field(..., description="Name of the uploaded PDF.")
-
-# Database helper functions
-def init_db():
-    """Initialize the SQLite database."""
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS pipelines (
-                pdf_name TEXT PRIMARY KEY,
-                vectorstore_path TEXT,
-                pdf_path TEXT
-            )
-        """)
-        conn.commit()
-
-def store_pipeline_metadata(pdf_name: str, pdf_path: str, vectorstore_path: str):
-    """Store pipeline metadata in SQLite database."""
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT OR REPLACE INTO pipelines (pdf_name, pdf_path, vectorstore_path)
-            VALUES (?, ?, ?)
-        """, (pdf_name, pdf_path, vectorstore_path))
-        conn.commit()
-
-def get_pipeline_metadata(pdf_name: str):
-    """Retrieve pipeline metadata from SQLite database."""
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT pdf_path, vectorstore_path FROM pipelines WHERE pdf_name = ?
-        """, (pdf_name,))
-        return cursor.fetchone()
 
 # Initialize the DB
 init_db()
@@ -98,6 +68,9 @@ async def upload_pdf(file: UploadFile = File(...)):
 @app.post("/ask")
 async def ask_question(request: Request, params: AskQuestionRequest):
     try:
+        # Read and print the raw body as a string
+        body = await request.body()  # This reads the request body
+        print(body.decode('utf-8'))  # Decode bytes to string
         
         # Rest of the logic
         metadata = get_pipeline_metadata(params.pdf_name)
