@@ -1,3 +1,7 @@
+Here's the updated `README.md` with the addition of the `.env` setup for the `DEEPSEEK_API_KEY`:
+
+---
+
 # RAG Application with LangGraph and DeepSeek Models
 
 This repository contains a Python-based web application that integrates **FastAPI** for the backend, **Streamlit** for the frontend, and combines **LangGraph** with **ModernBERT** and **DeepSeek** models. The backend utilizes state-of-the-art NLP models for embedding, generation, and structured output.
@@ -11,11 +15,9 @@ This repository contains a Python-based web application that integrates **FastAP
 - [Model Information](#model-information)
   - [Embedding Model: ModernBERT](#embedding-model-modernbert)
   - [DeepSeek Models](#deepseek-models)
-    - [DeepSeek-R1: Reasoning Model](#deepseek-r1-reasoning-model)
 - [License](#license)
 
 ## Installation
-
 
 ### Steps
 
@@ -35,6 +37,17 @@ This repository contains a Python-based web application that integrates **FastAP
     ```bash
     pip install -r requirements.txt
     ```
+
+4. **Create the `.env` file:**
+    In the root directory of the project, create a `.env` file containing your DeepSeek API key:
+
+    ```
+    DEEPSEEK_API_KEY=your_api_key_here
+    ```
+
+    Replace `your_api_key_here` with your actual API key from DeepSeek.
+
+    You can use the `python-dotenv` library to load the environment variables from the `.env` file.
 
 ## Usage
 
@@ -83,4 +96,4 @@ embeddings = HuggingFaceEmbeddings(model_name="nomic-ai/modernbert-embed-base", 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.  
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
