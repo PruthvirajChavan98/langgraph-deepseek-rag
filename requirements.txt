@@ -1,0 +1,11 @@
+langgraph
+langchain-openai
+langchain-huggingface
+langchain-chroma
+langchain_community
+langchain_experimental
+pdfplumber
+fastapi
+uvicorn
+streamlit
+python-multipart
