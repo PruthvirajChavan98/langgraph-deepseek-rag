@@ -1,7 +1,3 @@
-Here's the updated `README.md` with the addition of the `.env` setup for the `DEEPSEEK_API_KEY`:
-
----
-
 # RAG Application with LangGraph and DeepSeek Models
 
 This repository contains a Python-based web application that integrates **FastAPI** for the backend, **Streamlit** for the frontend, and combines **LangGraph** with **ModernBERT** and **DeepSeek** models. The backend utilizes state-of-the-art NLP models for embedding, generation, and structured output.
