@@ -3,7 +3,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 import os
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_openai import ChatOpenAI
+from langchain_deepseek import ChatDeepSeek
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
@@ -32,8 +32,8 @@ os.makedirs(VECTORSTORE_BASE_PATH, exist_ok=True)  # Ensure the vectorstore dire
 
 # Pre-initialize components (embeddings, vectorstore, retriever)
 embeddings = HuggingFaceEmbeddings(model_name="nomic-ai/modernbert-embed-base", cache_folder="./saved_model")
-llm_chat = ChatOpenAI(model="deepseek-chat", temperature=0, openai_api_key=DEEPSEEK_API_KEY, openai_api_base='https://api.deepseek.com')
-llm_resoner = ChatOpenAI(model="deepseek-reasoner", temperature=0, openai_api_key=DEEPSEEK_API_KEY, openai_api_base='https://api.deepseek.com')
+llm_chat = ChatDeepSeek(model="deepseek-chat", temperature=0, api_key=DEEPSEEK_API_KEY, api_base='https://api.deepseek.com')
+llm_resoner = ChatDeepSeek(model="deepseek-reasoner", temperature=0, api_key=DEEPSEEK_API_KEY, api_base='https://api.deepseek.com')
 
 # Pydantic model
 class AskQuestionRequest(BaseModel):
