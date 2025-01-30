@@ -1,5 +1,5 @@
 langgraph
-langchain-openai
+langchain-deepseek-official
 langchain-huggingface
 langchain-chroma
 langchain_community
